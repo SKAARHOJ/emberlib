@@ -32,7 +32,7 @@ const (
 
 type TupleDescription struct {
 	Type ParameterType
-	Name      string
+	Name string
 }
 
 type FunctionContents struct {
@@ -141,9 +141,9 @@ func encodeTupleDescriptions(ctxt uint8, tuples []*TupleDescription, writer *asn
 			return errors.Update(err)
 		}
 		err = writer.EndSequence()
-	if err != nil {
-		return errors.Update(err)
-	}
+		if err != nil {
+			return errors.Update(err)
+		}
 	}
 	err = writer.EndSequence()
 	if err != nil {
@@ -321,7 +321,7 @@ func (fc *FunctionContents) Encode(writer *asn1.ASNWriter) errors.Error {
 			return errors.Update(err)
 		}
 	}
-	
+
 	if len(fc.result) > 0 {
 		err = encodeTupleDescriptions(asn1.Context(3), fc.result, writer)
 		if err != nil {
@@ -333,14 +333,14 @@ func (fc *FunctionContents) Encode(writer *asn1.ASNWriter) errors.Error {
 }
 
 func (fc *FunctionContents) ToString() string {
-	str:= ""
-	valStr,err := fc.GetIdentifier()
+	str := ""
+	valStr, err := fc.GetIdentifier()
 	if err == nil {
-		str = fmt.Sprintf("%s  identifier: %s\n",str, valStr)
+		str = fmt.Sprintf("%s  identifier: %s\n", str, valStr)
 	}
-	valStr,err = fc.GetDescription()
+	valStr, err = fc.GetDescription()
 	if err == nil {
-		str = fmt.Sprintf("%s  description: %s\n",str, valStr)
+		str = fmt.Sprintf("%s  description: %s\n", str, valStr)
 	}
 	return fmt.Sprintf("{\n%s}\n", str)
 }

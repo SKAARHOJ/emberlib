@@ -3,9 +3,9 @@ package embertree
 import (
 	"fmt"
 
-	. "github.com/dufourgilles/emberlib/logger"
 	"github.com/dufourgilles/emberlib/asn1"
 	"github.com/dufourgilles/emberlib/errors"
+	. "github.com/dufourgilles/emberlib/logger"
 )
 
 type EmberContents interface {
@@ -43,7 +43,7 @@ type Element struct {
 	contents        EmberContents
 	contentsCreator ContentCreator
 	listeners       map[Listener]Listener
-	logger Logger
+	logger          Logger
 	// for qualified element
 	isQualified bool
 
@@ -64,11 +64,11 @@ func NewElement(tag uint8, number int, contentsCreator ContentCreator) *Element 
 		isMatrix:        false,
 		isQualified:     false,
 		contentsCreator: contentsCreator,
-		logger: NewNullLogger(),
+		logger:          NewNullLogger(),
 		listeners:       make(map[Listener]Listener)}
 }
 
-func (element *Element)SetLogger(logger Logger) {
+func (element *Element) SetLogger(logger Logger) {
 	if logger != nil {
 		element.logger = logger
 	}
@@ -305,7 +305,7 @@ func (element *Element) GetDirectoryMsg(listener Listener) (*RootElement, errors
 
 func Path2String(path asn1.RelativeOID) string {
 	str := ""
-	for index,number := range(path) {
+	for index, number := range path {
 		if index == 0 {
 			str = fmt.Sprintf("%d", number)
 		} else {
@@ -315,17 +315,17 @@ func Path2String(path asn1.RelativeOID) string {
 	return str
 }
 
-func (element *Element)ToString() string {
+func (element *Element) ToString() string {
 	contentString := "nil"
 	content := element.GetContent()
 	if content != nil {
 		contentString = content.ToString()
 	}
 	children := ""
-	for _,child := range(element.Children) {
+	for _, child := range element.Children {
 		children = fmt.Sprintf("%s%s\n", children, child.ToString())
 	}
 
-	return fmt.Sprintf("{\n  tag: %d,\n  number: %d,\n  path: %s,\n  content: %s,\n  children: [\n%s]\n}", 
-		element.tag, element.Number, Path2String(element.GetPath()),contentString, children)
+	return fmt.Sprintf("{\n  tag: %d,\n  number: %d,\n  path: %s,\n  content: %s,\n  children: [\n%s]\n}",
+		element.tag, element.Number, Path2String(element.GetPath()), contentString, children)
 }

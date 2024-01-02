@@ -5,10 +5,11 @@ import (
 	"fmt"
 	"net"
 	"time"
-	. "github.com/dufourgilles/emberlib/logger"
+
 	"github.com/dufourgilles/emberlib/asn1"
 	"github.com/dufourgilles/emberlib/embertree"
 	"github.com/dufourgilles/emberlib/errors"
+	. "github.com/dufourgilles/emberlib/logger"
 )
 
 const maxQueueSize = 256
@@ -22,7 +23,6 @@ type channelMessage interface {
 	getError() error
 	getData() []byte
 }
-
 
 func newPacketQueue() *packetQueue {
 	var q packetQueue
@@ -38,7 +38,7 @@ func (p *packetQueue) isEmpty() bool {
 	return p.queue.Len() == 0
 }
 
-func (p *packetQueue) add(msg *embertree.RootElement) errors.Error{
+func (p *packetQueue) add(msg *embertree.RootElement) errors.Error {
 	if p.size() > maxQueueSize {
 		return errors.New("Queue size limit. Drop message.")
 	}
@@ -48,9 +48,9 @@ func (p *packetQueue) add(msg *embertree.RootElement) errors.Error{
 
 func (p *packetQueue) getNext() (*embertree.RootElement, errors.Error) {
 	if p.queue.Len() > 0 {
-		qElement :=  p.queue.Front()
+		qElement := p.queue.Front()
 		p.queue.Remove(qElement)
-		if val, ok := qElement.Value.(*embertree.RootElement); ok {			
+		if val, ok := qElement.Value.(*embertree.RootElement); ok {
 			return val, nil
 		}
 		return nil, errors.New("Queue Error: Queue Datatype is incorrect")
@@ -59,41 +59,41 @@ func (p *packetQueue) getNext() (*embertree.RootElement, errors.Error) {
 }
 
 type _TimerCallbacks struct {
-	timer *time.Timer
+	timer    *time.Timer
 	listener embertree.Listener
-	client *S101Client
+	client   *S101Client
 }
 
 type S101Client struct {
-	stats S101SocketStats
-	conn  net.Conn
-	raddr string
-	outQ  *packetQueue
-	decoder *S101Decoder
-	msTimeout int
-	logger Logger
-	timerCallbacks map[embertree.ListeningNode]*_TimerCallbacks
-	getTreeCallback embertree.Listener
-	tree *embertree.RootElement
-	incomingDataChan chan channelMessage
-	outgoingDataChan chan channelMessage
+	stats             S101SocketStats
+	conn              net.Conn
+	raddr             string
+	outQ              *packetQueue
+	decoder           *S101Decoder
+	msTimeout         int
+	logger            Logger
+	timerCallbacks    map[embertree.ListeningNode]*_TimerCallbacks
+	getTreeCallback   embertree.Listener
+	tree              *embertree.RootElement
+	incomingDataChan  chan channelMessage
+	outgoingDataChan  chan channelMessage
 	freeTimerCallback embertree.Listener
 }
 
-func (s *S101Client)keepAliveReqHandler(kal []byte) errors.Error {
+func (s *S101Client) keepAliveReqHandler(kal []byte) errors.Error {
 	// This should go at the head of the queue
 	s.logger.Debug("KAL Request Received.\n")
 	s.outQ.queue.PushFront(GetKeepAliveResponse())
 	return nil
 }
 
-func (s *S101Client)keepAliveResponseHandler(kal []byte) errors.Error {
+func (s *S101Client) keepAliveResponseHandler(kal []byte) errors.Error {
 	// do nothing for the moment
 	s.logger.Debug("KAL Response Received.\n")
 	return nil
 }
 
-func (s *S101Client)emberPacketHandler(packet []byte) errors.Error {
+func (s *S101Client) emberPacketHandler(packet []byte) errors.Error {
 	// This should be a valid EmberRoot.
 	s.logger.Debug("Ember Frame - start decoding.\n")
 	s.logger.Debugln(packet)
@@ -102,36 +102,36 @@ func (s *S101Client)emberPacketHandler(packet []byte) errors.Error {
 	return err
 }
 
-func (s *S101Client)errorHandler(err errors.Error) {
+func (s *S101Client) errorHandler(err errors.Error) {
 	s.logger.Error(err)
 }
 
 func NewS101Client() *S101Client {
 	client := S101Client{msTimeout: 0}
-	client.decoder = NewS101Decoder(client.keepAliveReqHandler,client.keepAliveResponseHandler,client.emberPacketHandler, client.errorHandler )
+	client.decoder = NewS101Decoder(client.keepAliveReqHandler, client.keepAliveResponseHandler, client.emberPacketHandler, client.errorHandler)
 	client.stats.Reset()
 	client.logger = NewNullLogger()
 	client.timerCallbacks = make(map[embertree.ListeningNode]*_TimerCallbacks)
 	client.outQ = newPacketQueue()
 	client.tree = embertree.NewTree()
 	client.incomingDataChan = make(chan channelMessage, 100)
-	client.outgoingDataChan = make(chan channelMessage, 1)	
+	client.outgoingDataChan = make(chan channelMessage, 1)
 	return &client
 }
 
-func (s *S101Client)SetTimeout(msTimeout int) {
+func (s *S101Client) SetTimeout(msTimeout int) {
 	if msTimeout >= 0 {
 		s.msTimeout = msTimeout
 	}
 }
 
-func (s *S101Client)SetLogger(logger Logger) {
+func (s *S101Client) SetLogger(logger Logger) {
 	if logger != nil {
 		s.logger = logger
 	}
 }
 
-func (s *S101Client)Connect(address string, port uint16) errors.Error {
+func (s *S101Client) Connect(address string, port uint16) errors.Error {
 	var err error
 	if s.IsConnected() {
 		return errors.New("Client already connected to %s:%d", address, port)
@@ -145,7 +145,7 @@ func (s *S101Client)Connect(address string, port uint16) errors.Error {
 	return nil
 }
 
-func (s *S101Client)Disconnect() errors.Error {
+func (s *S101Client) Disconnect() errors.Error {
 	if !s.IsConnected() {
 		return errors.New("Client not connected.")
 	}
@@ -154,11 +154,11 @@ func (s *S101Client)Disconnect() errors.Error {
 	return errors.NewError(err)
 }
 
-func (s *S101Client)IsConnected() bool {
+func (s *S101Client) IsConnected() bool {
 	return s.conn != nil
 }
 
-func (s *S101Client)sendBER(data []byte) errors.Error {
+func (s *S101Client) sendBER(data []byte) errors.Error {
 	if !s.IsConnected() {
 		return errors.New("Not connected")
 	}
@@ -181,7 +181,7 @@ func (s *S101Client)sendBER(data []byte) errors.Error {
 	return nil
 }
 
-func (s *S101Client)sendBERNode(node *embertree.RootElement) errors.Error {
+func (s *S101Client) sendBERNode(node *embertree.RootElement) errors.Error {
 	if node == nil {
 		return errors.New("null node")
 	}
@@ -195,8 +195,7 @@ func (s *S101Client)sendBERNode(node *embertree.RootElement) errors.Error {
 	return s.sendBER(data)
 }
 
-
-func (t *_TimerCallbacks)Receive(node interface{}, err errors.Error) {
+func (t *_TimerCallbacks) Receive(node interface{}, err errors.Error) {
 	treeNode := node.(embertree.ListeningNode)
 	timerCB := t.client.timerCallbacks[treeNode]
 	if timerCB == nil {
@@ -209,7 +208,7 @@ func (t *_TimerCallbacks)Receive(node interface{}, err errors.Error) {
 	treeNode.RemoveListener(t)
 }
 
-func (s *S101Client)runTimer(node *embertree.Element, callback embertree.Listener, timeoutError errors.Error) {
+func (s *S101Client) runTimer(node *embertree.Element, callback embertree.Listener, timeoutError errors.Error) {
 	var treeNode embertree.ListeningNode
 	if node == nil {
 		treeNode = s.tree
@@ -228,72 +227,72 @@ func (s *S101Client)runTimer(node *embertree.Element, callback embertree.Listene
 	treeNode.RemoveListener(s.freeTimerCallback)
 }
 
-func (s *S101Client)GetDirectory(node *embertree.Element, callback embertree.Listener) errors.Error {
+func (s *S101Client) GetDirectory(node *embertree.Element, callback embertree.Listener) errors.Error {
 	var msg *embertree.RootElement
 	var err errors.Error
-	timeoutError := errors.New("GetDirectory timed out.")	
+	timeoutError := errors.New("GetDirectory timed out.")
 	if node == nil {
 		s.logger.Debug("Send GetDirectory for root.\n")
-		msg,err = s.tree.GetDirectoryMsg(callback)		
+		msg, err = s.tree.GetDirectoryMsg(callback)
 	} else {
 		s.logger.Debug("Send GetDirectory for %s.\n", embertree.Path2String(node.GetPath()))
 		msg = node.GetQualifiedDirectoryMsg(callback)
 	}
 	if err != nil {
-		s.logger.Debug("GetDirectory.\n",err)
+		s.logger.Debug("GetDirectory.\n", err)
 		return errors.Update(err)
 	}
 	if s.msTimeout > 0 {
 		go s.runTimer(node, callback, timeoutError)
 	}
-	
+
 	return s.outQ.add(msg)
 }
 
 type _ElementListeners struct {
-	client *S101Client
+	client       *S101Client
 	rootListener *_RoottListeners
 }
 
 // getElementCallback
-func (l *_ElementListeners)Receive(node interface{}, err errors.Error) {
-	l.client.logger.Debug("Element Callback.\n")	
+func (l *_ElementListeners) Receive(node interface{}, err errors.Error) {
+	l.client.logger.Debug("Element Callback.\n")
 	if err == nil && node != nil {
 		element := node.(*embertree.Element)
 		element.RemoveListener(l)
-		for _,child := range(element.Children) {
+		for _, child := range element.Children {
 			l.rootListener.IncPendingGetDir()
 			elementCallback := &_ElementListeners{client: l.client, rootListener: l.rootListener}
 			go l.client.GetDirectory(child, elementCallback)
 		}
 	}
-	l.rootListener.DecPendingGetDir(node,err)
+	l.rootListener.DecPendingGetDir(node, err)
 }
 
 type _RoottListeners struct {
-	client *S101Client
+	client              *S101Client
 	pendingGetDirectory uint
-	listener embertree.Listener
+	listener            embertree.Listener
 }
 
-func (r *_RoottListeners)IncPendingGetDir() {
+func (r *_RoottListeners) IncPendingGetDir() {
 	r.pendingGetDirectory++
 }
 
-func (r *_RoottListeners)DecPendingGetDir(node interface{}, err errors.Error) {
+func (r *_RoottListeners) DecPendingGetDir(node interface{}, err errors.Error) {
 	r.pendingGetDirectory--
 	if r.pendingGetDirectory == 0 {
 		r.listener.Receive(r.client.tree, err)
 	}
 }
 
-func (r *_RoottListeners)Receive(node interface{}, err errors.Error) {	
+func (r *_RoottListeners) Receive(node interface{}, err errors.Error) {
 	if err == nil && node != nil {
 		root := node.(*embertree.RootElement)
 		r.client.logger.Debug("Root CallBack.\n")
 		r.client.logger.Debug(root.ToString())
 		root.RemoveListener(r)
-		for _,element := range(root.RootElementCollection) {
+		for _, element := range root.RootElementCollection {
 			r.IncPendingGetDir()
 			elementCallback := &_ElementListeners{client: r.client, rootListener: r}
 			r.client.logger.Debug("Root Callback GetDir for %s.\n", embertree.Path2String(element.GetPath()))
@@ -306,31 +305,31 @@ func (r *_RoottListeners)Receive(node interface{}, err errors.Error) {
 	}
 }
 
-func (s *S101Client)GetTree(listener embertree.Listener) errors.Error {
+func (s *S101Client) GetTree(listener embertree.Listener) errors.Error {
 	rootCallback := &_RoottListeners{client: s, listener: listener, pendingGetDirectory: 0}
 	return s.GetDirectory(nil, rootCallback)
 }
 
-func (s *S101Client)processBuffer(l int, buffer []byte) {
+func (s *S101Client) processBuffer(l int, buffer []byte) {
 	//Decode the message
 	s.decoder.DecodeBuffer(l, buffer)
 }
 
-func (s *S101Client)iomanager() {
+func (s *S101Client) iomanager() {
 	s.logger.Debug("iomanager started.\n")
 	buffer := make([]byte, maxBufferSize)
 	for s.IsConnected() {
 		// Send messages present in our Q - but no more than max
 		messagesToSend := s.outQ.queue.Len()
 		if messagesToSend > 3 {
-			messagesToSend = 3;
+			messagesToSend = 3
 		}
 		if messagesToSend > 1 {
 			s.logger.Debug("iomanager to send %d messages.\n", messagesToSend)
 		}
 		count := 0
 		for ; count < messagesToSend; count++ {
-			root,_ := s.outQ.getNext()
+			root, _ := s.outQ.getNext()
 			if root != nil {
 				err := s.sendBERNode(root)
 				if err != nil {
@@ -345,7 +344,7 @@ func (s *S101Client)iomanager() {
 		deadline := time.Now().Add(100)
 		s.conn.SetReadDeadline(deadline)
 		for {
-			len,_ := s.conn.Read(buffer)
+			len, _ := s.conn.Read(buffer)
 			if len > 0 {
 				s.logger.Debug("iomanager received a message of %d bytes.\n", len)
 				s.stats.RxBytes += uint64(len)

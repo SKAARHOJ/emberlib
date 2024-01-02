@@ -1,8 +1,8 @@
 package embertree
 
 import (
-	"github.com/dufourgilles/emberlib/errors"
 	"github.com/dufourgilles/emberlib/asn1"
+	"github.com/dufourgilles/emberlib/errors"
 )
 
 var QualifiedParameterApplication = asn1.Application(9)
@@ -16,18 +16,19 @@ var qualifiedTags = map[uint8]bool{
 	QualifiedMatrixApplication:    true,
 	QualifiedFunctionApplication:  true}
 
-
 func getNumberFromPath(path asn1.RelativeOID) (int, errors.Error) {
 	l := len(path)
 	if l <= 0 {
 		return -1, errors.New("Invalid path.")
 	}
-	return int(path[l-1]),nil
+	return int(path[l-1]), nil
 }
 
 func NewQualifiedElement(tag uint8, path asn1.RelativeOID, contentCreator ContentCreator) *Element {
-	number,err := getNumberFromPath(path)
-	if err != nil { return nil }
+	number, err := getNumberFromPath(path)
+	if err != nil {
+		return nil
+	}
 	q := NewElement(tag, number, contentCreator)
 	q.isQualified = true
 	q.path = path

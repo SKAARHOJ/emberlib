@@ -123,7 +123,7 @@ func DecodeElement(reader *asn1.ASNReader) (*Element, errors.Error) {
 		path     asn1.RelativeOID
 		number   int
 		contents interface{}
-	)	
+	)
 	tag, err := reader.Peek()
 	if err != nil {
 		return nil, errors.Update(err)

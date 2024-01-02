@@ -34,8 +34,8 @@ func NewASNWriter() *ASNWriter {
 }
 
 func (asn *ASNWriter) Read(p []byte) (int, errors.Error) {
-	len,err := asn.data.Read(p)
-	return len,errors.NewError(err)
+	len, err := asn.data.Read(p)
+	return len, errors.NewError(err)
 }
 
 func (asn *ASNWriter) Len() int {

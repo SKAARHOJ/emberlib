@@ -17,13 +17,13 @@ type FieldFlags int
 
 const (
 	SparseFieldFlags      FieldFlags = -2
-	ALLFieldFlags         FieldFlags  = iota
-	DefaultFieldFlags     FieldFlags  = iota
-	IdentifierFieldFlags  FieldFlags  = iota
-	DescriptionFieldFlags FieldFlags  = iota
-	TreeFieldFlags        FieldFlags  = iota
-	ValueFieldFlags       FieldFlags  = iota
-	ConnectionsFieldFlags FieldFlags  = iota
+	ALLFieldFlags         FieldFlags = iota
+	DefaultFieldFlags     FieldFlags = iota
+	IdentifierFieldFlags  FieldFlags = iota
+	DescriptionFieldFlags FieldFlags = iota
+	TreeFieldFlags        FieldFlags = iota
+	ValueFieldFlags       FieldFlags = iota
+	ConnectionsFieldFlags FieldFlags = iota
 )
 
 type CommandContents struct {

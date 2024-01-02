@@ -108,7 +108,7 @@ func TestDecodeRootWithChildren(t *testing.T) {
 	}
 }
 
-//96,16,107,14,160,12,98,10,160,3,2,1,32,161,3,2,1
+// 96,16,107,14,160,12,98,10,160,3,2,1,32,161,3,2,1
 func TestDecodeRootGetDirectory(t *testing.T) {
 	expectedResult := []byte{96, 16, 107, 14, 160, 12, 98, 10, 160, 3, 2, 1, 32, 161, 3, 2, 1, 0xff}
 	reader := asn1.NewASNReader(expectedResult)
@@ -177,7 +177,6 @@ func TestDecodeRootMatrix(t *testing.T) {
 }
 
 type RootListener struct {
-
 }
 
 func (rl *RootListener) Receive(interface{}, errors.Error) {

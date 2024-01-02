@@ -210,18 +210,18 @@ func (contents *NodeContents) ToString() string {
 	isRoot := ""
 	isOnline := ""
 	if contents.identifier.isSet {
-		identifier,_ = contents.GetIdentifier()
+		identifier, _ = contents.GetIdentifier()
 	}
 	if contents.description.isSet {
-		description,_ = contents.GetDescription()
+		description, _ = contents.GetDescription()
 	}
-	val,err := contents.GetIsRoot()
+	val, err := contents.GetIsRoot()
 	if val {
 		isRoot = "true"
 	} else if err == nil {
 		isRoot = "false"
 	}
-	val,err = contents.GetIsOnline()
+	val, err = contents.GetIsOnline()
 	if val {
 		isOnline = "true"
 	} else if err == nil {

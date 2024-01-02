@@ -398,26 +398,25 @@ func (c *MatrixContent) Decode(reader *asn1.ASNReader) errors.Error {
 	return nil
 }
 
-
 func (c *MatrixContent) ToString() string {
-	str:= ""
-	valStr,err := c.GetIdentifier()
+	str := ""
+	valStr, err := c.GetIdentifier()
 	if err == nil {
-		str = fmt.Sprintf("%s  identifier: %s\n",str, valStr)
+		str = fmt.Sprintf("%s  identifier: %s\n", str, valStr)
 	}
-	valStr,err = c.GetDescription()
+	valStr, err = c.GetDescription()
 	if err == nil {
-		str = fmt.Sprintf("%s  description: %s\n",str, valStr)
+		str = fmt.Sprintf("%s  description: %s\n", str, valStr)
 	}
-	t,err := c.GetType()
+	t, err := c.GetType()
 	if t == OneToN {
 		str = fmt.Sprintf(("%s  type: OneToN"))
-	} else if t ==  NToN {
+	} else if t == NToN {
 		str = fmt.Sprintf(("%s  type: NToN"))
 	} else {
 		str = fmt.Sprintf(("%s  type: OneToOne"))
 	}
-	m,err := c.GetMode()
+	m, err := c.GetMode()
 	if m == Linear {
 		str = fmt.Sprintf(("%s  mode: Linear"))
 	} else {

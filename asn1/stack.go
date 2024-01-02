@@ -1,15 +1,14 @@
 package asn1
 
 type stack struct {
-	data []interface{}	
+	data []interface{}
 }
 
-func (s *stack)Push(v interface{}) {
+func (s *stack) Push(v interface{}) {
 	s.data = append(s.data, v)
 }
 
-
-func (s *stack)Pop() interface{} {
+func (s *stack) Pop() interface{} {
 	var v interface{}
 	l := len(s.data)
 	if l > 0 {

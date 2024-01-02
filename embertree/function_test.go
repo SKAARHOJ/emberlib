@@ -28,7 +28,7 @@ func TestFunctionDecode(t *testing.T) {
 func TestFunctionEncode(t *testing.T) {
 	writer := asn1.NewASNWriter()
 	f := embertree.NewFunction(7)
-	contents := f.CreateContent();
+	contents := f.CreateContent()
 	if contents == nil {
 		t.Errorf("Failed to get function content")
 		return
@@ -44,19 +44,19 @@ func TestFunctionEncode(t *testing.T) {
 		return
 	}
 	b := make([]byte, writer.Len())
-	_,err = writer.Read(b)
+	_, err = writer.Read(b)
 	if err != nil {
 		t.Error(err)
 	}
 
 	s := ""
-	for _,bb := range(b) {
+	for _, bb := range b {
 		s = fmt.Sprintf("%s,0x%x", s, bb)
 	}
 	fmt.Println(s)
 
 	reader := asn1.NewASNReader(b)
-	decodedFunction, err := embertree.DecodeElement(reader) 
+	decodedFunction, err := embertree.DecodeElement(reader)
 	if err != nil {
 		t.Error(err)
 	}
